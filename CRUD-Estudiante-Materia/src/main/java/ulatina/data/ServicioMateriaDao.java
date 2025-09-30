@@ -159,5 +159,25 @@ public class ServicioMateriaDao extends Servicio implements Dao <Materia> {
         
         return listaMaterias;
     }
+
+    public void eliminarTodasMaterias() throws ClassNotFoundException, SQLException {
+        PreparedStatement pstmt = null;
+        try {
+            super.conectarBD();
+            String sql = "DELETE FROM materia"; 
+            pstmt = super.getConexion().prepareStatement(sql);
+            pstmt.executeUpdate();
+
+            String resetAuto = "ALTER TABLE materia AUTO_INCREMENT = 1";
+            pstmt = super.getConexion().prepareStatement(resetAuto);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            cerrarPreparedStatement(pstmt);
+            cerrarConexion();
+        }
+    }
     
 }
