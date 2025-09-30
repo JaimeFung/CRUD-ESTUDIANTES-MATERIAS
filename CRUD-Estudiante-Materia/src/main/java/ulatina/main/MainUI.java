@@ -110,8 +110,13 @@ public class MainUI {
                         String newNombre = scanner.nextLine();
                         System.out.print("Nuevo correo: ");
                         String newCorreo = scanner.nextLine();
-                        controller.actualizar(id, newNombre, newCorreo);
-                        
+                
+                        if ((newNombre == null || newNombre.isEmpty()) || (newCorreo == null || newCorreo.isEmpty())) {
+                        System.out.println("No se puede ingresar datos vacios");}
+                        else{
+                           controller.actualizar(id, newNombre, newCorreo);
+                           System.out.println("Estudiante actualizado.");
+                        }
                         break;
                     case 4:
                         System.out.print("ID: ");
