@@ -2,7 +2,10 @@ ulatina\model\Estudiante.class
 ulatina\controller\MateriasController.class
 ulatina\controller\EstudianteController.class
 ulatina\data\ServicioEstudiante.class
+ulatina\data\ServicioEstudianteDao.class
+ulatina\data\ServicioMateriaDao.class
 ulatina\data\Servicio.class
 ulatina\main\MainUI.class
 ulatina\data\ServicioMateria.class
+ulatina\data\Dao.class
 ulatina\model\Materia.class

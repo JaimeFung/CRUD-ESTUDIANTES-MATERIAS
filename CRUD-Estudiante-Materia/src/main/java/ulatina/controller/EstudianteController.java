@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 import java.sql.SQLException;
 import java.util.List;
-import ulatina.data.ServicioEstudiante;
-import ulatina.data.ServicioMateria;
+import ulatina.data.ServicioEstudianteDao;
+import ulatina.data.ServicioMateriaDao;
 import ulatina.model.Estudiante;
 import ulatina.model.Materia;
 /**
@@ -17,16 +17,12 @@ import ulatina.model.Materia;
 
 public class EstudianteController implements Serializable {
 
-    private ServicioEstudiante servicioEstudiante;
-    private ServicioMateria servicioMateria;
+    private final ServicioEstudianteDao sDE = new ServicioEstudianteDao();
+    private final ServicioMateriaDao sDM = new ServicioMateriaDao();
     
-    public EstudianteController() {
-        servicioEstudiante = new ServicioEstudiante();
-        servicioMateria = new ServicioMateria();
-    }
 
     public List<Estudiante> listar() throws SQLException, ClassNotFoundException {
-        return servicioEstudiante.obtenerEstudiantes();
+        return sDE.getAll();
     }
 
     public void crear(String nombre, String correo) throws SQLException, ClassNotFoundException {
@@ -36,7 +32,7 @@ public class EstudianteController implements Serializable {
         if ((nombre == null || nombre.isEmpty()) || (correo == null || correo.isEmpty())) {
             System.out.println("No se puede ingresar datos vacios");  
         }else{
-           servicioEstudiante.insertarEstudiante(e);
+           sDE.save(e);
            System.out.println("Estudiante insertado.");
         }
     }
@@ -49,38 +45,39 @@ public class EstudianteController implements Serializable {
         if ((nombre == null || nombre.isEmpty()) || (correo == null || correo.isEmpty())) {
              System.out.println("No se puede ingresar datos vacios");}
         else{
-           servicioEstudiante.actualizarEstudiante(e); 
+           sDE.update(e);
            System.out.println("Estudiante actualizado.");
         }
     }
+    
     public void eliminar(int id) throws SQLException, ClassNotFoundException {
         Estudiante e = new Estudiante();
         e.setId(id);
-        servicioEstudiante.eliminarEstudiante(e);
+        sDE.delete(e);
     }
 
     public Estudiante buscarPorCorreo(String correo) throws SQLException, ClassNotFoundException {
-        return servicioEstudiante.validarEstudiante(correo);
+        return sDE.validarEstudiante(correo);
     }
     
     public void matricularEstudiante(int idEstudiante, int idMateria) throws SQLException, ClassNotFoundException {
-        servicioEstudiante.matricularEstudiante(idEstudiante, idMateria);
+        sDE.matricularEstudiante(idEstudiante, idMateria);
     }
 
     public List<Estudiante> listarEstudiantes() throws SQLException, ClassNotFoundException {
-        return servicioEstudiante.obtenerEstudiantes();
+        return sDE.getAll();
     }
 
     public List<Materia> listarMaterias() throws SQLException, ClassNotFoundException {
-        return servicioMateria.obtenerMaterias();
+        return sDM.getAll();
     }
 
     public List<Materia> obtenerMateriasDelEstudiante(int idEstudiante) throws SQLException, ClassNotFoundException {
-        return servicioEstudiante.obtenerMateriasEstudiante(idEstudiante);
+        return sDE.obtenerMateriasEstudiante(idEstudiante);
     }
     
     public void insertarEstudianteYMateria(Estudiante estudiante, Materia materia) throws Exception {
-        servicioEstudiante.insertarEstudianteYMateria(estudiante, materia);
+        sDE.insertarEstudianteYMateria(estudiante, materia);
     }
 
 }

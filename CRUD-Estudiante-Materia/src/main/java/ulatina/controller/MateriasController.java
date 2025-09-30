@@ -7,41 +7,38 @@ package ulatina.controller;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
-import ulatina.data.ServicioMateria;
+import ulatina.data.ServicioMateriaDao;
 import ulatina.model.Materia;
 
 
 public class MateriasController implements Serializable{
-   private ServicioMateria servicio;
+   private final ServicioMateriaDao sD = new ServicioMateriaDao();
 
-    public MateriasController() {
-        servicio = new ServicioMateria();
-    }
 
     public List<Materia> listar() throws SQLException, ClassNotFoundException {
-        return servicio.obtenerMaterias();
+        return sD.getAll();
     }
 
     public void crear(String nombre) throws SQLException, ClassNotFoundException {
         Materia m = new Materia();
         m.setNombre(nombre);
-        servicio.insertarMateria(m);
+        sD.save(m);
     }
 
     public void actualizar(int id, String nombre) throws SQLException, ClassNotFoundException {
         Materia m = new Materia();
         m.setId(id);
         m.setNombre(nombre);
-        servicio.actualizarMateria(m);
+        sD.update(m);
     }
 
     public void eliminar(int id) throws SQLException, ClassNotFoundException {
         Materia m = new Materia();
         m.setId(id);
-        servicio.eliminarMateria(m);
+        sD.delete(m);
     }
 
     public Materia buscarPorNombre(String nombre) throws SQLException, ClassNotFoundException {
-        return servicio.validarMateria(nombre);
+        return sD.validarMateria(nombre);
     }
 }
