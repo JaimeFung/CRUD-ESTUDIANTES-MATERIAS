@@ -75,5 +75,11 @@ public class EstudianteController implements Serializable {
         sDE.insertarEstudianteYMateria(estudiante, materia);
     }
 
+    public void eliminarTodosEstudiantes() throws SQLException, ClassNotFoundException {
+        
+        sDE.eliminarTodosEstudiantes();
+        
+    }
+    
 }
 

@@ -42,7 +42,7 @@ public class MateriasController implements Serializable{
         return sD.validarMateria(nombre);
     }
    
-   public void eliminarTodasMaterias() throws SQLException, ClassNotFoundException {
+    public void eliminarTodasMaterias() throws SQLException, ClassNotFoundException {
         
         sD.eliminarTodasMaterias();
         

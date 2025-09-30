@@ -287,4 +287,24 @@ public class ServicioEstudianteDao extends Servicio implements Dao <Estudiante> 
         }
     }
     
+    public void eliminarTodosEstudiantes() throws ClassNotFoundException, SQLException {
+        PreparedStatement pstmt = null;
+        try {
+            super.conectarBD();
+            String sql = "DELETE FROM estudiante"; 
+            pstmt = super.getConexion().prepareStatement(sql);
+            pstmt.executeUpdate();
+
+            String resetAuto = "ALTER TABLE estudiante AUTO_INCREMENT = 1";
+            pstmt = super.getConexion().prepareStatement(resetAuto);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            cerrarPreparedStatement(pstmt);
+            cerrarConexion();
+        }
+    }
+    
 }

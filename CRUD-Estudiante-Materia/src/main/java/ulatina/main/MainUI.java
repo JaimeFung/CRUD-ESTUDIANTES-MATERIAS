@@ -4,6 +4,8 @@
 
 package ulatina.main;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 import ulatina.controller.EstudianteController;
 import ulatina.controller.MateriasController;
@@ -22,9 +24,8 @@ public class MainUI {
             EstudianteController estudianteController = new EstudianteController();
             MateriasController materiaController = new MateriasController();
 
-            
             int opcionPrincipal;
-            
+
             do {
                 System.out.println("\n=== MENU PRINCIPAL ===");
                 System.out.println("1. CRUD Estudiantes");
@@ -34,7 +35,7 @@ public class MainUI {
                 System.out.print("Seleccione una opcion: ");
                 opcionPrincipal = scanner.nextInt();
                 scanner.nextLine();
-                
+
                 switch (opcionPrincipal) {
                     case 1:
                         crudEstudiantes(scanner, estudianteController);
@@ -45,7 +46,7 @@ public class MainUI {
                     case 3:
                         menuMatricula(scanner, estudianteController);
                         break;
-                        
+
                     case 0:
                         System.out.println("Saliendo del sistema...");
                         break;
@@ -55,8 +56,7 @@ public class MainUI {
             } while (opcionPrincipal != 0);
         }
     }
-    
-    
+
     private static void crudEstudiantes(Scanner scanner, EstudianteController controller) {
         int opcion;
         do {
@@ -71,82 +71,145 @@ public class MainUI {
             opcion = scanner.nextInt();
             scanner.nextLine();
 
-            try {
-                switch (opcion) {
-                    case 1:
-                        for (Estudiante e : controller.listar()) {
-                            System.out.println(e.getId() + " | " + e.getNombre() + " | " + e.getCorreo());
+            switch (opcion) {
+                case 1:
+                    try {
+                        List<Estudiante> estudiante = controller.listar();
+                        if (estudiante.isEmpty()) {
+                            System.out.println("No hay estudiantes registrados.");
+                        } else {
+
+                            for (Estudiante e : estudiante) {
+                                System.out.println(e.getId() + " | " + e.getNombre() + " | " + e.getCorreo());
+                            }
                         }
+                    } catch (ClassNotFoundException | SQLException e) {
+                        System.out.println("Error al listar materias: " + e.getMessage());
+                    }
+                    break;
+
+                case 2:
+
+                    System.out.print("Nombre del estudiante: ");
+                    String nombreEst = scanner.nextLine();
+                    System.out.print("Correo del estudiante: ");
+                    String correoEst = scanner.nextLine();
+                    System.out.print("Nombre de la materia: ");
+                    String nombreMat = scanner.nextLine();
+
+                    if (nombreEst.isEmpty() || correoEst.isEmpty() || nombreMat.isEmpty()) {
+                        System.out.println("Error: Ningun campo puede estar vacio.");
                         break;
-                    case 2:
+                    }
 
-                        System.out.print("Nombre del estudiante: ");
-                        String nombreEst = scanner.nextLine();
-                        System.out.print("Correo del estudiante: ");
-                        String correoEst = scanner.nextLine();
-                        Estudiante estudiante = new Estudiante();
-                        estudiante.setNombre(nombreEst);
-                        estudiante.setCorreo(correoEst);
+                    Estudiante estudiante = new Estudiante();
+                    estudiante.setNombre(nombreEst);
+                    estudiante.setCorreo(correoEst);
 
-                        
-                        System.out.print("Nombre de la materia: ");
-                        String nombreMat = scanner.nextLine();
-                        Materia materia = new Materia();
-                        materia.setNombre(nombreMat);
+                    Materia materia = new Materia();
+                    materia.setNombre(nombreMat);
 
-                        try {
-                            controller.insertarEstudianteYMateria(estudiante, materia);
-                            System.out.println("Insercion completada correctamente.");
-                        } catch (Exception e) {
-                            System.out.println("Error al insertar: " + e.getMessage());
-                        }
+                    try {
+                        controller.insertarEstudianteYMateria(estudiante, materia);
+                        System.out.println("Insercion completada correctamente.");
+                    } catch (Exception e) {
+                        System.out.println("Error al insertar: " + e.getMessage());
+                    }
+
+                    break;
+
+                case 3:
+                    System.out.print("ID del estudiante a actualizar: ");
+                    String idInput = scanner.nextLine().trim();
+
+                    if (idInput.isEmpty()) {
+                        System.out.println("Error: El ID no puede estar vacio. ");
                         break;
-                        
+                    }
 
-                    case 3:
-                        System.out.print("ID: ");
-                        int id = scanner.nextInt(); scanner.nextLine();
-                        System.out.print("Nuevo nombre: ");
-                        String newNombre = scanner.nextLine();
-                        System.out.print("Nuevo correo: ");
-                        String newCorreo = scanner.nextLine();
-                
-                        if ((newNombre == null || newNombre.isEmpty()) || (newCorreo == null || newCorreo.isEmpty())) {
-                        System.out.println("No se puede ingresar datos vacios");}
-                        else{
-                           controller.actualizar(id, newNombre, newCorreo);
-                           System.out.println("Estudiante actualizado.");
-                        }
+                    int id;
+                    try {
+                        id = Integer.parseInt(idInput);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error: El ID debe ser un numero.");
                         break;
-                    case 4:
-                        System.out.print("ID: ");
-                        int idEliminar = scanner.nextInt(); scanner.nextLine();
+                    }
+
+                    System.out.print("Nuevo nombre: ");
+                    String newNombre = scanner.nextLine().trim();
+                    System.out.print("Nuevo correo: ");
+                    String newCorreo = scanner.nextLine().trim();
+
+                    if (newNombre.isEmpty() || newCorreo.isEmpty()) {
+                        System.out.println("Error: Ningun campo puede estar vacio.");
+                        break;
+                    }
+
+                    try {
+                        controller.actualizar(id, newNombre, newCorreo);
+                        System.out.println("Estudiante actualizado correctamente.");
+                    } catch (ClassNotFoundException | SQLException e) {
+                        System.out.println("Error al actualizar: " + e.getMessage());
+                    }
+
+                    break;
+                case 4:
+                    System.out.print("ID del estudiante a eliminar: ");
+                    String idEliminarInput = scanner.nextLine().trim();
+
+                    if (idEliminarInput.isEmpty()) {
+                        System.out.println("Error: El ID no puede estar vacio.");
+                        break;
+                    }
+
+                    int idEliminar;
+                    try {
+                        idEliminar = Integer.parseInt(idEliminarInput);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error: El ID debe ser un número.");
+                        break;
+                    }
+
+                    try {
                         controller.eliminar(idEliminar);
-                        System.out.println("Estudiante eliminado.");
+                        System.out.println("Estudiante eliminado correctamente.");
+                    } catch (ClassNotFoundException | SQLException e) {
+                        System.out.println("Error al eliminar: " + e.getMessage());
+                    }
+
+                    break;
+
+                case 5:
+                    System.out.print("Correo del estudiante a buscar: ");
+                    String buscarCorreo = scanner.nextLine().trim();
+
+                    if (buscarCorreo.isEmpty()) {
+                        System.out.println("Error: El correo no puede estar vacío.");
                         break;
-                    case 5:
-                        System.out.print("Correo: ");
-                        String buscarCorreo = scanner.nextLine();
+                    }
+
+                    try {
                         Estudiante e = controller.buscarPorCorreo(buscarCorreo);
                         if (e != null) {
+                            System.out.println("ID | Nombre | Correo");
                             System.out.println(e.getId() + " | " + e.getNombre() + " | " + e.getCorreo());
                         } else {
-                            System.out.println("No encontrado.");
+                            System.out.println("Estudiante no encontrado.");
                         }
-                        break;
-                    case 0:
-                        System.out.println("Volviendo al menú principal...");
-                        break;
-                    default:
-                        System.out.println("Opción inválida.");
-                }
-            } catch (Exception ex) {
-                System.out.println("Error: " + ex.getMessage());
+                    } catch (ClassNotFoundException | SQLException ex) {
+                        System.out.println("Error al buscar: " + ex.getMessage());
+                    }
+                    break;
+
+                case 0:
+                    System.out.println("Volviendo al menu principal...");
+                    break;
+                default:
+                    System.out.println("Opcion invalida.");
             }
 
         } while (opcion != 0);
     }
-
 
     private static void crudMaterias(Scanner scanner, MateriasController controller) {
         int opcion;
@@ -157,7 +220,7 @@ public class MainUI {
             System.out.println("3. Actualizar materia");
             System.out.println("4. Eliminar materia");
             System.out.println("5. Buscar materia por nombre");
-            System.out.println("0. Volver al menú principal");
+            System.out.println("0. Volver al menu principal");
             System.out.print("Seleccione una opcion: ");
             opcion = scanner.nextInt();
             scanner.nextLine();
@@ -165,45 +228,115 @@ public class MainUI {
             try {
                 switch (opcion) {
                     case 1:
-                        for (Materia m : controller.listar()) {
-                            System.out.println(m.getId() + " | " + m.getNombre());
+                        try {
+                            List<Materia> materias = controller.listar();
+                            if (materias.isEmpty()) {
+                                System.out.println("No hay materias registradas.");
+                            } else {
+                                System.out.println("ID | Nombre");
+                                for (Materia m : materias) {
+                                    System.out.println(m.getId() + " | " + m.getNombre());
+                                }
+                            }
+                        } catch (ClassNotFoundException | SQLException e) {
+                            System.out.println("Error al listar materias: " + e.getMessage());
                         }
                         break;
+
                     case 2:
-                        System.out.print("Nombre: ");
-                        String nombre = scanner.nextLine();
-                        controller.crear(nombre);
-                        System.out.println("Materia insertada.");
-                        break;
-                    case 3:
-                        System.out.print("ID: ");
-                        int id = scanner.nextInt(); scanner.nextLine();
-                        System.out.print("Nuevo nombre: ");
-                        String nuevoNombre = scanner.nextLine();
-                        controller.actualizar(id, nuevoNombre);
-                        System.out.println("Materia actualizada.");
-                        break;
-                    case 4:
-                        System.out.print("ID: ");
-                        int idEliminar = scanner.nextInt(); scanner.nextLine();
-                        controller.eliminar(idEliminar);
-                        System.out.println("Materia eliminada.");
-                        break;
-                    case 5:
-                        System.out.print("Nombre: ");
-                        String buscar = scanner.nextLine();
-                        Materia m = controller.buscarPorNombre(buscar);
-                        if (m != null) {
-                            System.out.println(m.getId() + " | " + m.getNombre());
-                        } else {
-                            System.out.println("No se encontró esa materia.");
+                        System.out.print("Nombre de la materia: ");
+                        String nombre = scanner.nextLine().trim();
+                        if (nombre.isEmpty()) {
+                            System.out.println("Error: El nombre no puede estar vacio.");
+                            break;
+                        }
+                        try {
+                            controller.crear(nombre);
+                            System.out.println("Materia insertada correctamente.");
+                        } catch (ClassNotFoundException | SQLException e) {
+                            System.out.println("Error al crear materia: " + e.getMessage());
                         }
                         break;
+
+                    case 3:
+                        System.out.print("ID de la materia a actualizar: ");
+                        String idInput = scanner.nextLine().trim();
+                        if (idInput.isEmpty()) {
+                            System.out.println("Error: El ID no puede estar vacio.");
+                            break;
+                        }
+                        int id;
+                        try {
+                            id = Integer.parseInt(idInput);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error: El ID debe ser un numero.");
+                            break;
+                        }
+
+                        System.out.print("Nuevo nombre de la materia: ");
+                        String nuevoNombre = scanner.nextLine().trim();
+                        if (nuevoNombre.isEmpty()) {
+                            System.out.println("Error: El nombre no puede estar vacio.");
+                            break;
+                        }
+
+                        try {
+                            controller.actualizar(id, nuevoNombre);
+                            System.out.println("Materia actualizada correctamente.");
+                        } catch (ClassNotFoundException | SQLException e) {
+                            System.out.println("Error al actualizar materia: " + e.getMessage());
+                        }
+                        break;
+
+                    case 4:
+                        System.out.print("ID de la materia a eliminar: ");
+                        String idEliminarInput = scanner.nextLine().trim();
+                        if (idEliminarInput.isEmpty()) {
+                            System.out.println("Error: El ID no puede estar vacio.");
+                            break;
+                        }
+                        int idEliminar;
+                        try {
+                            idEliminar = Integer.parseInt(idEliminarInput);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error: El ID debe ser un numero.");
+                            break;
+                        }
+
+                        try {
+                            controller.eliminar(idEliminar);
+                            System.out.println("Materia eliminada correctamente.");
+                        } catch (Exception e) {
+                            System.out.println("Error al eliminar materia: " + e.getMessage());
+                        }
+                        break;
+
+                    case 5:
+                        System.out.print("Nombre de la materia a buscar: ");
+                        String buscar = scanner.nextLine().trim();
+                        if (buscar.isEmpty()) {
+                            System.out.println("Error: El nombre no puede estar vacio.");
+                            break;
+                        }
+                        try {
+                            Materia m = controller.buscarPorNombre(buscar);
+                            if (m != null) {
+                                System.out.println("ID | Nombre");
+                                System.out.println(m.getId() + " | " + m.getNombre());
+                            } else {
+                                System.out.println("No se encontro esa materia.");
+                            }
+                        } catch (ClassNotFoundException | SQLException e) {
+                            System.out.println("Error al buscar materia: " + e.getMessage());
+                        }
+                        break;
+
                     case 0:
-                        System.out.println("Volviendo al menú principal...");
+                        System.out.println("Volviendo al menu principal...");
                         break;
                     default:
                         System.out.println("Opción inválida.");
+
                 }
             } catch (Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
@@ -211,60 +344,65 @@ public class MainUI {
 
         } while (opcion != 0);
     }
+
     private static void menuMatricula(Scanner scanner, EstudianteController controller) {
-    int opcion;
-    do {
-        System.out.println("\n=== MATRICULACION ===");
-        System.out.println("1. Asignar materia a estudiante");
-        System.out.println("2. Ver materias de un estudiante");
-        System.out.println("0. Volver al menú principal");
-        System.out.print("Seleccione una opcion: ");
-        opcion = scanner.nextInt(); scanner.nextLine();
+        int opcion;
+        do {
+            System.out.println("\n=== MATRICULAR ===");
+            System.out.println("1. Asignar materia a estudiante");
+            System.out.println("2. Ver materias de un estudiante");
+            System.out.println("0. Volver al menu principal");
+            System.out.print("Seleccione una opcion: ");
+            opcion = scanner.nextInt();
+            scanner.nextLine();
 
-        try {
-            switch (opcion) {
-                case 1:
-                    System.out.println("\n--- Estudiantes ---");
-                    for (Estudiante e : controller.listarEstudiantes()) {
-                        System.out.println(e.getId() + " | " + e.getNombre());
-                    }
-                    System.out.print("ID del estudiante: ");
-                    int idEstudiante = scanner.nextInt(); scanner.nextLine();
+            try {
+                switch (opcion) {
+                    case 1:
+                        System.out.println("\n--- Estudiantes ---");
+                        for (Estudiante e : controller.listarEstudiantes()) {
+                            System.out.println(e.getId() + " | " + e.getNombre());
+                        }
+                        System.out.print("ID del estudiante: ");
+                        int idEstudiante = scanner.nextInt();
+                        scanner.nextLine();
 
-                    System.out.println("\n--- Materias ---");
-                    for (Materia m : controller.listarMaterias()) {
-                        System.out.println(m.getId() + " | " + m.getNombre());
-                    }
-                    System.out.print("ID de la materia: ");
-                    int idMateria = scanner.nextInt(); scanner.nextLine();
+                        System.out.println("\n--- Materias ---");
+                        for (Materia m : controller.listarMaterias()) {
+                            System.out.println(m.getId() + " | " + m.getNombre());
+                        }
+                        System.out.print("ID de la materia: ");
+                        int idMateria = scanner.nextInt();
+                        scanner.nextLine();
 
-                    controller.matricularEstudiante(idEstudiante, idMateria);
-                    System.out.println("Materia asignada al estudiante.");
-                    break;
+                        controller.matricularEstudiante(idEstudiante, idMateria);
+                        System.out.println("Materia asignada al estudiante.");
+                        break;
 
-                case 2:
-                    System.out.println("\n--- Estudiantes ---");
-                    for (Estudiante e : controller.listarEstudiantes()) {
-                        System.out.println(e.getId() + " | " + e.getNombre());
-                    }
-                    System.out.print("ID del estudiante: ");
-                    int id = scanner.nextInt(); scanner.nextLine();
+                    case 2:
+                        System.out.println("\n--- Estudiantes ---");
+                        for (Estudiante e : controller.listarEstudiantes()) {
+                            System.out.println(e.getId() + " | " + e.getNombre());
+                        }
+                        System.out.print("ID del estudiante: ");
+                        int id = scanner.nextInt();
+                        scanner.nextLine();
 
-                    System.out.println("Materias del estudiante:");
-                    for (Materia m : controller.obtenerMateriasDelEstudiante(id)) {
-                        System.out.println(m.getId() + " | " + m.getNombre());
-                    }
-                    break;
+                        System.out.println("Materias del estudiante:");
+                        for (Materia m : controller.obtenerMateriasDelEstudiante(id)) {
+                            System.out.println(m.getId() + " | " + m.getNombre());
+                        }
+                        break;
 
-                case 0:
-                    System.out.println("Volviendo al menu principal...");
-                    break;
-                default:
-                    System.out.println("Opción invalida.");
+                    case 0:
+                        System.out.println("Volviendo al menu principal...");
+                        break;
+                    default:
+                        System.out.println("Opción invalida.");
+                }
+            } catch (ClassNotFoundException | SQLException ex) {
+                System.out.println("Error: " + ex.getMessage());
             }
-        } catch (Exception ex) {
-            System.out.println("Error: " + ex.getMessage());
-        }
-    } while (opcion != 0);
-}
+        } while (opcion != 0);
+    }
 }
