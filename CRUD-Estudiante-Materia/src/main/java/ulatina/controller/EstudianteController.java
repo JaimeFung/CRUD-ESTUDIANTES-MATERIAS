@@ -42,12 +42,7 @@ public class EstudianteController implements Serializable {
         e.setId(id);
         e.setNombre(nombre);
         e.setCorreo(correo);
-        if ((nombre == null || nombre.isEmpty()) || (correo == null || correo.isEmpty())) {
-             System.out.println("No se puede ingresar datos vacios");}
-        else{
-           sDE.update(e);
-           System.out.println("Estudiante actualizado.");
-        }
+        sDE.update(e);
     }
     
     public void eliminar(int id) throws SQLException, ClassNotFoundException {
@@ -81,3 +76,4 @@ public class EstudianteController implements Serializable {
     }
 
 }
+
